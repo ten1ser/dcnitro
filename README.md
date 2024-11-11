@@ -126,9 +126,6 @@ Selfbots are strictly against Discord's Terms of Service. If you use this script
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
 ## Acknowledgements
 - Thanks to the contributors of `discord.py` and other Python packages that made this project possible.
 
