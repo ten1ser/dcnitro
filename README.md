@@ -161,5 +161,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 ---
 
-**350 Characters Description** A Discord selfbot for sniping giveaways and Nitro codes, featuring instant redemption, stealth measures (random headers, User-Agent), and webhook notifications. Designed for educational purposes only. Selfbotting is against Discord's TOS; use at your own risk.
-
