@@ -49,10 +49,47 @@ The bot requires a `config.json` file in the root directory with the following f
 Example `config.json`:
 ```json
 {
-    "Token": "YOUR_DISCORD_USER_TOKEN",
+    "Token": [
+        "YOUR_DISCORD_USER_TOKEN"
+    ],
     "Webhook": "YOUR_WEBHOOK_URL",
-    "BotBlacklist": ["123456789012345678", "987654321098765432"],
-    "WebhookNotification": true
+    "WebhookNotification": true,
+    "BotBlacklist": [
+        "432610292342587392",
+        "1156418379050127430",
+        "1137344054187802664",
+        "1089476688246738985",
+        "1154077045903593555",
+        "1149106738151305216",
+        "1074118427184205974",
+        "1093310583266353192",
+        "776897904404987946",
+        "1164588905065095219",
+        "1140615763082879047",
+        "646937666251915264",
+        "368521195940741122",
+        "1028956609382199346",
+        "571027211407196161",
+        "1071634826341396540",
+        "838278395795079209",
+        "320731871359008768",
+        "1201646718895280148",
+        "415773861486002186",
+        "1100424685272961135",
+        "873722451547291678",
+        "1006190394415005788",
+        "1153715777594200074",
+        "1089935069927456849",
+        "669228505128501258",
+        "1130083482878623835",
+        "716390085896962058",
+        "678344927997853742",
+        "1274435601470459946",
+        "356268235697553409",
+        "1275655805093281863",
+        "1193672589428654120",
+        "751151926959276050"
+    ]
 }
 ```
 
@@ -96,8 +133,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 - Thanks to the contributors of `discord.py` and other Python packages that made this project possible.
 
 **Note**: The use of this bot should be strictly for educational purposes only. Any misuse, including violating Discord's Terms of Service, may result in a ban or other legal consequences.
-
----
-**350 Characters Description**
-A Discord selfbot for sniping giveaways and Nitro codes, featuring instant redemption, stealth measures (random headers, User-Agent), and webhook notifications. Designed for educational purposes only. Selfbotting is against Discord's ToS; use at your own risk.
-
