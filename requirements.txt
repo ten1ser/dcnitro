@@ -1,0 +1,15 @@
+git+https://github.com/dolfies/discord.py-self@master#egg=discord.py-self[speed]
+requests
+brotlipy
+aiohttp
+beautifulsoup4
+requests
+numpy
+pytesseract
+opencv-python
+urllib3
+pynacl
+aiodns
+dnspython
+tenacity
+pyotp
