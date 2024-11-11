@@ -6,7 +6,7 @@ This is a Discord selfbot script designed to participate in giveaways and attemp
 
 ## Features
 
-- **Button Clicks and Emoji Reactions**: Capable of clicking interactive buttons and adding emoji reactions to join giveaways or confirm actions.
+- **Button Clicks and Emoji Reactions**: Capable of clicking interactive buttons and adding emoji reactions to join giveaways.
 - **Instant Nitro Sniper**: Quickly detects and attempts to redeem Nitro gift codes.
 - **Giveaway Sniper**: Automatically joins Discord giveaways and claims the prize if you win.
 - **Stealth Measures**: Randomized User Agents, hardware identifiers, and additional request headers to minimize detection.
