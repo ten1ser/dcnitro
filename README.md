@@ -20,8 +20,8 @@ This bot is for educational purposes only. Selfbotting (using unauthorized bots 
 ## Installation
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/discord-giveaway-sniper.git
-   cd discord-giveaway-sniper
+   git clone https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot.git
+   cd Discord-Giveaway-and-Nitro-Sniper-Selfbot
    ```
 
 2. **Install Dependencies**
