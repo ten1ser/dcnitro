@@ -50,6 +50,9 @@ This bot is for educational purposes only. Using unauthorized bots on a normal D
 
    ![Bot Running in Windows CMD](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/cmd.png)
 
+   
+   *Screenshots have been added to illustrate the bot's functions and provide better understanding of its operations.*
+
 ## Configuration 🔧
 
 The bot requires a `config.json` file in the root directory with the following fields:
@@ -162,6 +165,8 @@ Example `config.json`:
 Selfbots are strictly against Discord's Terms of Service. Use this script at your own risk, and only on test accounts that you are willing to lose.
 
 ## Contributing 🤝
+
+If you appreciate my hard work and would like to support me, you can do so with any amount on PayPal: [paypal.me/JakubAmbrus](https://paypal.me/JakubAmbrus)
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
