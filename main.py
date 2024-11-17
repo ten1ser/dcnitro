@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import asyncio
 import json
@@ -29,7 +29,7 @@ def clear_console():
 clear_console()
 
 # Set up Discord API base URL
-BASE_URL = "https://canary.discord.com/api/v10"
+BASE_URL = "https://discord.com/api/v9"
 
 # Load config data
 def load_config():
@@ -97,7 +97,7 @@ def restart_script():
         sys.exit(1)
 
 def is_blacklisted(user_id):
-    return str(user_id) in BOT_BLACKLIST or user_id == client.user.id
+    return str(user_id) in BOT_BLACKLIST or (client.user and user_id == client.user.id)
 
 def log(content, do_everyone=False, save=False):
     logging.info(content) if save else None
@@ -105,7 +105,7 @@ def log(content, do_everyone=False, save=False):
         content = f"@everyone {content}"
     print(f"[!] LOG: {content}")
 
-async def send_webhook_notification(title, description, content="", color=16732345):
+async def send_webhook_notification(title, description, content="", color=16732345, footer_text="Giveaway Sniper", avatar_url="https://i.imgur.com/44N46up.gif"):
     if WEBHOOK_NOTIFICATION and WEBHOOK:
         data = {
             "content": content,
@@ -113,10 +113,10 @@ async def send_webhook_notification(title, description, content="", color=167323
                 "title": title,
                 "description": description,
                 "color": color,
-                "footer": {"text": "Giveaway Sniper"}
+                "footer": {"text": footer_text}
             }],
             "username": "Giveaway Sniper",
-            "avatar_url": "https://i.imgur.com/44N46up.gif"
+            "avatar_url": avatar_url
         }
         async with aiohttp.ClientSession() as session:
             try:
@@ -129,37 +129,48 @@ async def send_webhook_notification(title, description, content="", color=167323
 async def NitroInfo(elapsed, code, status):
     log(f"Elapsed: {elapsed}, Code: {code}, Status: {status}")
     await send_webhook_notification(
-        "Nitro Code Redemption Status",
-        f"Elapsed: {elapsed}\nCode: {code}\nStatus: {status}",
-        "@everyone" if status == "Successfully redeemed" else ""
+        title="🔑 Nitro Code Redemption Status",
+        description=f"**Elapsed Time:** `{elapsed}` seconds\n**Code:** `{code}`\n**Status:** {status}",
+        content="@everyone" if status == "Successfully redeemed" else "",
+        color=3447003,  # Blue color
+        footer_text="Nitro Sniper | Status Update",
+        avatar_url="https://i.imgur.com/nitro-icon.png"
     )
 
-async def GiveawayInfo(message, action):
-    log(f"Sniped a giveaway! {action} Reaction [Click Here]({message.jump_url})")
+async def GiveawayInfo(message, action, location, author):
+    log(f"Sniped a giveaway! {action} Reaction | Location: {location} | Author: {author}")
     await send_webhook_notification(
-        "Giveaway Sniped",
-        f"Action: {action}\n[Click Here to view message]({message.jump_url})"
+        title="🎁 Giveaway Sniped!",
+        description=f"**Action Taken:** {action}\n**Location:** `{location}`\n**Hosted by:** {author}\n[Click Here to View Message]({message.jump_url})",
+        color=15844367,  # Orange color
+        footer_text="Giveaway Sniper | Action Report",
+        avatar_url="https://i.imgur.com/giveaway-icon.png"
     )
 
-async def GiveawayWinInfo(message, prize):
-    log(f"Detected Giveaway Win! Prize: {prize} [Click Here]({message.jump_url})", do_everyone=True, save=True)
+async def GiveawayWinInfo(message, prize, location, author):
+    log(f"Detected Giveaway Win! Prize: {prize} | Location: {location} | Author: {author} [Click Here]({message.jump_url})", do_everyone=True, save=True)
     await send_webhook_notification(
-        "Giveaway Win Detected",
-        f"Congratulations! You've won a giveaway for **{prize}**.\n[Click Here to view the winning message]({message.jump_url})",
-        "@everyone"
+        title="🏆 **Giveaway Win Detected!**",
+        description=f"**Congratulations!** You've won a giveaway for **{prize}**!\n**Location:** `{location}`\n**Hosted by:** {author}\n[Click Here to View Winning Message]({message.jump_url})",
+        content="@everyone",
+        color=3066993,  # Green color
+        footer_text="Giveaway Win | Notification",
+        avatar_url="https://i.imgur.com/win-icon.png"
     )
 
 async def BotConnectedInfo(user):
     log(f"Giveaway Sniper is connected to | user: {user.name} | id: {user.id}")
     await send_webhook_notification(
-        "Bot Connected",
-        f"Giveaway Sniper is connected to:\nUser: {user.name}\nID: {user.id}",
-        color=65280  # Green color
+        title="✅ Bot Successfully Connected",
+        description=f"**Giveaway Sniper is now connected.**\n**User:** `{user.name}`\n**ID:** `{user.id}`",
+        color=8311585,  # Purple color
+        footer_text="Connection Status",
+        avatar_url="https://i.imgur.com/connected-icon.png"
     )
 
 async def check_nitro_codes(message):
     if "discord.gift/" in message.content.lower():
-        codes = re.findall(r"https?://discord.gift/([a-zA-Z0-9]+)", message.content)
+        codes = re.findall(r"discord\.gift/([a-zA-Z0-9]+)", message.content)
         for code in codes:
             try:
                 await redeem_nitro_code(TOKEN, code)
@@ -185,42 +196,55 @@ async def redeem_nitro_code(token, code):
 
             status_messages = {
                 200: "Successfully redeemed",
-                400: "Invalid code or Captcha required",
+                400: "Invalid code",
                 401: "Unauthorized",
                 403: "Already redeemed",
                 404: "Unknown code",
                 429: "Rate limited, retrying after some time"
             }
 
-            if status == 429:
+            if status == 400:
+                # Separate Invalid code and Captcha required
+                error_detail = await response.json()
+                if 'captcha_key' in error_detail:
+                    status_message = "Captcha required"
+                else:
+                    status_message = "Invalid code"
+            elif status == 429:
                 retry_after = int(response.headers.get("Retry-After", 60))
+                log(f"Rate limited, retrying in {retry_after} seconds...")
                 await asyncio.sleep(retry_after)
                 await redeem_nitro_code(token, code)  # Retry after rate limit
+                return
             else:
                 status_message = status_messages.get(status, f"Error {status}")
-                await NitroInfo(elapsed_str, code, status_message)
+
+            await NitroInfo(elapsed_str, code, status_message)
 
 async def handle_giveaway_reaction(message):
     delay = random.uniform(15, 30)  # Random delay to prevent detection
     await asyncio.sleep(delay)
     try:
-        if message:
+        if message and message.guild and message.author:
+            location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
+            author = message.author.name
+
             if message.components and message.components[0].children:
                 button = message.components[0].children[0]
                 if button and hasattr(button, 'click') and button.type == discord.ComponentType.button and button.style in [discord.ButtonStyle.primary, discord.ButtonStyle.success]:
                     await button.click()
-                    await GiveawayInfo(message, "Clicked Button")
+                    await GiveawayInfo(message, "Clicked Button", location, author)
             else:
                 for reaction in message.reactions:
                     if str(reaction.emoji) == "🎉":
                         await message.add_reaction("🎉")
-                        await GiveawayInfo(message, "Reacted with Emoji")
+                        await GiveawayInfo(message, "Reacted with Emoji", location, author)
     except Exception as e:
         log(f"Error handling giveaway reaction: {e}")
 
 async def detect_giveaway_win_message(message):
     keywords = ["won", "winner", "congratulations", "victory"]
-    if client.user is None:
+    if client.user is None or message.guild is None or message.author is None:
         return
 
     def check_content(content):
@@ -237,11 +261,16 @@ async def detect_giveaway_win_message(message):
         if prize_match:
             prize = prize_match.group(1).strip()
 
+    location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
+    author = message.author.name
+
     if check_content(message.content) or any(check_content(embed.to_dict().get("description", "")) for embed in message.embeds):
-        await GiveawayWinInfo(message, prize)
+        await GiveawayWinInfo(message, prize, location, author)
         await notify_giveaway_creator(message, prize)
 
 async def notify_giveaway_creator(message, prize):
+    if message.author is None:
+        return
     giveaway_creator = message.mentions[0] if message.mentions else message.author
     dm_message = (f"Hello {giveaway_creator.name}, I noticed that I won the giveaway you hosted! 🎉\n"
                   f"Prize: **{prize}**\n"
@@ -255,6 +284,8 @@ async def notify_giveaway_creator(message, prize):
         log(f"Failed to send a private message to {giveaway_creator.name}: {e}")
 
 async def check_giveaway_message(message):
+    if message.guild is None or message.author is None:
+        return
     keywords = [
         "giveaway", "Ends at", "Hosted by", ":gift:", ":tada:", "**giveaway**",
         "🎉", "Winners:", "Entries:", "ends:"
@@ -271,11 +302,14 @@ client = commands.Bot(command_prefix=";", help_command=None, self_bot=True)
 
 @client.event
 async def on_ready():
-    log(f"Giveaway Sniper is connected to | user: {client.user.name} | id: {client.user.id}")
-    await BotConnectedInfo(client.user)
+    if client.user is not None:
+        log(f"Giveaway Sniper is connected to | user: {client.user.name} | id: {client.user.id}")
+        await BotConnectedInfo(client.user)
 
 @client.event
 async def on_message(message):
+    if message.author is None:
+        return
     await check_nitro_codes(message)  # Nitro sniper should be instant
     if message.author.bot and not is_blacklisted(message.author.id):
         await check_giveaway_message(message)
