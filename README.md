@@ -48,6 +48,8 @@ This bot is for educational purposes only. Using unauthorized bots on a normal D
    python main.py
    ```
 
+   ![Bot Running in Windows CMD](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/cmd.png)
+
 ## Configuration 🔧
 
 The bot requires a `config.json` file in the root directory with the following fields:
@@ -105,7 +107,7 @@ Example `config.json`:
 }
 ```
 
-## Features in Detail 🔍
+## Features in Detail 💎
 
 ### 1. ⚡ Instant Nitro Sniper
 
@@ -113,12 +115,18 @@ Example `config.json`:
 - **Feedback Handling**: Differentiates between "Invalid code" and "Captcha required" for better clarity on the redemption status.
 - **Stealth Measures**: Implements various headers and randomized user agents to avoid detection.
 
+   ![Nitro Redeem Attempt Webhook Notify](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/nitroredeem.png)
+
 ### 2. 🎉 Giveaway Sniper
 
 - **Automatic Entry**: Joins giveaways by clicking interactive buttons or adding emoji reactions.
 - **Improved Detection**: Automatically detects giveaway messages and joins by reacting.
 - **Prize Notifications**: Sends webhook notifications and attempts to DM the giveaway creator if you win.
 - **Better Prize Extraction**: Uses enhanced logic to accurately extract and display the giveaway prize.
+
+   ![Giveaway Sniped Webhook Notify](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/gwsniped.png)
+
+   ![Giveaway Won Webhook Notify](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/gwwon.png)
 
 ### 3. 🕵️ Stealth Features
 
@@ -132,6 +140,8 @@ Example `config.json`:
 - **Comprehensive Logging**: Logs to `logs.txt` to keep track of important events such as snipes, warnings, and errors.
 - **Webhook Notifications**: Sends real-time updates to a configured webhook URL, detailing successful Nitro redemptions or giveaway wins.
 - **Improved Formatting**: Webhook messages are formatted with descriptive titles, colored embeds, and author/location details.
+
+   ![Bot Connected Webhook Notify](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/connect.png)
 
 ## Important Functions 🔑
 
