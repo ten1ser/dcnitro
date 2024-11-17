@@ -112,34 +112,40 @@ Example `config.json`:
 
 - Scans incoming messages for `discord.gift/` URLs and attempts to redeem them instantly using the provided user token.
 - Implements various headers and random user agents to avoid detection.
+- Differentiates between "Invalid code" and "Captcha required" to provide accurate feedback on code redemption status.
 
 ### 2. Giveaway Sniper
 
 - Automatically clicks buttons and reacts with emojis to join giveaways, ensuring better chances of winning.
 - Automatically detects giveaway messages and reacts to join.
 - If you win, it will notify you via webhook and attempt to send a DM to the giveaway creator.
+- Added better prize extraction logic for more detailed and accurate information.
 
 ### 3. Stealth Features
 
 - **Randomized Headers**: Adds `X-Super-Properties`, `X-Fingerprint`, and other headers to requests to mimic legitimate Discord client behavior.
 - **User Agent Rotation**: Utilizes a list of common user agents to make requests appear from various devices.
-- **Hardware Identifiers**: Randomizes device identifiers in headers.
+- **Hardware Identifiers**: Randomizes device identifiers in headers to further avoid detection.
+- **Error Handling for Rate Limits**: Added logic to respect Discord's rate limits and retry after a specified cooldown period.
 
 ### 4. Logging and Notifications
 
 - Logs to `logs.txt` to keep track of important events such as snipes, warnings, and errors.
 - Sends webhook notifications to a configured URL, allowing real-time tracking of successful Nitro redemptions or giveaway winnings.
+- Enhanced webhook messages with improved formatting and detailed information, including the author, location, and prize.
 
 ## Important Functions
 
-- **check\_nitro\_codes**: Detects and redeems Nitro codes as soon as they are posted.
-- **handle\_giveaway\_reaction**: Automatically reacts to giveaway messages to enter.
-- **BotConnectedInfo**: Sends a notification when the bot successfully connects to Discord.
+- **check_nitro_codes**: Detects and redeems Nitro codes as soon as they are posted.
+- **handle_giveaway_reaction**: Automatically reacts to giveaway messages to enter, including reacting to buttons or emojis.
+- **detect_giveaway_win_message**: Detects when a win message is posted and sends a notification, optionally attempting to DM the giveaway creator.
+- **BotConnectedInfo**: Sends a notification when the bot successfully connects to Discord, including detailed account information.
 
 ## Avoiding Detection
 
 - **Custom Headers & Device IDs**: Adds multiple custom headers to mimic Discord client requests more closely.
 - **Random User-Agent Strings**: Chooses a user-agent string from a predefined list to simulate requests from different devices.
+- **Randomized Hardware Identifiers**: Randomizes device and fingerprint identifiers to make each request appear unique.
 
 ## Warning
 
@@ -158,6 +164,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 - Thanks to the contributors of `discord.py` and other Python packages that made this project possible.
 
 **Note**: The use of this bot should be strictly for educational purposes only. Any misuse, including violating Discord's Terms of Service, may result in a ban or other legal consequences.
-
----
 
