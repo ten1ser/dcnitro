@@ -1,55 +1,54 @@
 # Discord Giveaway and Nitro Sniper Selfbot
 
-## Overview
+## Overview 🚀
 
-This is a Discord selfbot script designed to participate in giveaways and attempt to redeem Discord Nitro codes as fast as possible. The bot aims to operate stealthily to avoid detection, making use of various headers, user agents, and randomized values. **Use at your own risk**—selfbotting is against Discord's Terms of Service and can result in an account ban.
+This Discord selfbot script automatically participates in giveaways and attempts to redeem Discord Nitro codes as fast as possible. It aims to operate stealthily to avoid detection by using randomized headers, user agents, and device identifiers. **Use at your own risk**—selfbotting violates Discord's Terms of Service and may result in an account ban.
 
-## Features
+## Features 🌟
 
-- **Button Clicks and Emoji Reactions**: Capable of clicking interactive buttons and adding emoji reactions to join giveaways.
-- **Instant Nitro Sniper**: Quickly detects and attempts to redeem Nitro gift codes.
-- **Giveaway Sniper**: Automatically joins Discord giveaways and claims the prize if you win.
-- **Stealth Measures**: Randomized User Agents, hardware identifiers, and additional request headers to minimize detection.
-- **Webhook Notifications**: Sends real-time notifications to a configured webhook to keep track of snipes and winnings.
-- **Logging**: Logs important actions to both console and file.
+- 🎉 **Giveaway Participation**: Joins giveaways by clicking buttons or adding emoji reactions.
+- ⚡ **Instant Nitro Sniper**: Quickly detects and attempts to redeem Nitro gift codes.
+- 🕵️ **Stealth Features**: Uses randomized User Agents, device identifiers, and request headers to reduce detection risks.
+- 🔔 **Webhook Notifications**: Sends real-time notifications to a configured webhook to track snipes and winnings.
+- 📝 **Logging**: Logs important actions to both console and file for review.
 
-## Disclaimer
+## Disclaimer ⚠️
 
-This bot is for educational purposes only. Selfbotting (using unauthorized bots on a normal Discord user account) is against Discord's Terms of Service and may result in your account being permanently banned. The author is not responsible for any misuse or bans resulting from the use of this bot.
+This bot is for educational purposes only. Using unauthorized bots on a normal Discord user account is against Discord's Terms of Service and may result in your account being permanently banned. The author is not responsible for any misuse or bans resulting from the use of this bot.
 
-## Requirements
+## Requirements 📋
 
 - Python 3.7+
 - `aiohttp`, `discord.py` (selfbot version), and other dependencies listed in `requirements.txt`
 
-## Installation
+## Installation 💻
 
-1. **Clone the Repository**
+1. 📂 **Clone the Repository**
 
    ```bash
    git clone https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot
    cd Discord-Giveaway-and-Nitro-Sniper-Selfbot
    ```
 
-2. **Install Dependencies**
+2. 📦 **Install Dependencies**
    Ensure you have Python 3.7+ installed. Then run:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure Settings**
+3. ⚙️ **Configure Settings**
 
    - Copy `config.json.example` to `config.json`.
-   - Open `config.json` and add your **Discord Token**, **Webhook URL**, and other optional settings like **Blacklist** and **WebhookNotification**.
+   - Open `config.json` and add your **Discord Token**, **Webhook URL**, and other optional settings like **BotBlacklist** and **WebhookNotification**.
 
-4. **Run the Bot**
+4. ▶️ **Run the Bot**
 
    ```bash
    python main.py
    ```
 
-## Configuration
+## Configuration 🔧
 
 The bot requires a `config.json` file in the root directory with the following fields:
 
@@ -106,62 +105,63 @@ Example `config.json`:
 }
 ```
 
-## Features in Detail
+## Features in Detail 🔍
 
-### 1. Instant Nitro Sniper
+### 1. ⚡ Instant Nitro Sniper
 
-- Scans incoming messages for `discord.gift/` URLs and attempts to redeem them instantly using the provided user token.
-- Implements various headers and random user agents to avoid detection.
-- Differentiates between "Invalid code" and "Captcha required" to provide accurate feedback on code redemption status.
+- **Nitro Code Detection**: Scans incoming messages for `discord.gift/` URLs and attempts to redeem them instantly using the provided user token.
+- **Feedback Handling**: Differentiates between "Invalid code" and "Captcha required" for better clarity on the redemption status.
+- **Stealth Measures**: Implements various headers and randomized user agents to avoid detection.
 
-### 2. Giveaway Sniper
+### 2. 🎉 Giveaway Sniper
 
-- Automatically clicks buttons and reacts with emojis to join giveaways, ensuring better chances of winning.
-- Automatically detects giveaway messages and reacts to join.
-- If you win, it will notify you via webhook and attempt to send a DM to the giveaway creator.
-- Added better prize extraction logic for more detailed and accurate information.
+- **Automatic Entry**: Joins giveaways by clicking interactive buttons or adding emoji reactions.
+- **Improved Detection**: Automatically detects giveaway messages and joins by reacting.
+- **Prize Notifications**: Sends webhook notifications and attempts to DM the giveaway creator if you win.
+- **Better Prize Extraction**: Uses enhanced logic to accurately extract and display the giveaway prize.
 
-### 3. Stealth Features
+### 3. 🕵️ Stealth Features
 
-- **Randomized Headers**: Adds `X-Super-Properties`, `X-Fingerprint`, and other headers to requests to mimic legitimate Discord client behavior.
+- **Randomized Headers**: Adds `X-Super-Properties`, `X-Fingerprint`, and other headers to mimic legitimate Discord client behavior.
 - **User Agent Rotation**: Utilizes a list of common user agents to make requests appear from various devices.
-- **Hardware Identifiers**: Randomizes device identifiers in headers to further avoid detection.
-- **Error Handling for Rate Limits**: Added logic to respect Discord's rate limits and retry after a specified cooldown period.
+- **Randomized Device Identifiers**: Randomizes hardware identifiers in headers to further avoid detection.
+- **Rate Limit Handling**: Added logic to respect Discord's rate limits and retry after a cooldown period.
 
-### 4. Logging and Notifications
+### 4. 🔔 Logging and Notifications
 
-- Logs to `logs.txt` to keep track of important events such as snipes, warnings, and errors.
-- Sends webhook notifications to a configured URL, allowing real-time tracking of successful Nitro redemptions or giveaway winnings.
-- Enhanced webhook messages with improved formatting and detailed information, including the author, location, and prize.
+- **Comprehensive Logging**: Logs to `logs.txt` to keep track of important events such as snipes, warnings, and errors.
+- **Webhook Notifications**: Sends real-time updates to a configured webhook URL, detailing successful Nitro redemptions or giveaway wins.
+- **Improved Formatting**: Webhook messages are formatted with descriptive titles, colored embeds, and author/location details.
 
-## Important Functions
+## Important Functions 🔑
 
 - **check_nitro_codes**: Detects and redeems Nitro codes as soon as they are posted.
-- **handle_giveaway_reaction**: Automatically reacts to giveaway messages to enter, including reacting to buttons or emojis.
-- **detect_giveaway_win_message**: Detects when a win message is posted and sends a notification, optionally attempting to DM the giveaway creator.
-- **BotConnectedInfo**: Sends a notification when the bot successfully connects to Discord, including detailed account information.
+- **handle_giveaway_reaction**: Reacts to giveaway messages, either clicking buttons or adding emojis.
+- **detect_giveaway_win_message**: Detects when a win message is posted and sends notifications, optionally DMing the giveaway creator.
+- **BotConnectedInfo**: Notifies when the bot successfully connects to Discord, with account details.
 
-## Avoiding Detection
+## Avoiding Detection 🚫
 
-- **Custom Headers & Device IDs**: Adds multiple custom headers to mimic Discord client requests more closely.
-- **Random User-Agent Strings**: Chooses a user-agent string from a predefined list to simulate requests from different devices.
-- **Randomized Hardware Identifiers**: Randomizes device and fingerprint identifiers to make each request appear unique.
+- **Custom Headers & Device IDs**: Uses custom headers to closely mimic Discord client requests.
+- **Rotating User Agents**: Chooses a user-agent string from a predefined list to simulate requests from different devices.
+- **Random Device Identifiers**: Randomizes device and fingerprint identifiers to make each request unique.
+- **Rate Limit Respect**: Implements a `Retry-After` mechanism for 429 HTTP responses to avoid getting rate-limited further.
 
-## Warning
+## Warning ⚠️
 
-Selfbots are strictly against Discord's Terms of Service. If you use this script, you do so at your own risk. It is recommended to only use this on test accounts that you are willing to lose.
+Selfbots are strictly against Discord's Terms of Service. Use this script at your own risk, and only on test accounts that you are willing to lose.
 
-## Contributing
+## Contributing 🤝
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
+## License 📜
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
-## Acknowledgements
+## Acknowledgements 🙏
 
 - Thanks to the contributors of `discord.py` and other Python packages that made this project possible.
 
-**Note**: The use of this bot should be strictly for educational purposes only. Any misuse, including violating Discord's Terms of Service, may result in a ban or other legal consequences.
+**Note**: This bot is for educational purposes only. Misuse, including violating Discord's Terms of Service, can lead to a ban or other legal consequences.
 
