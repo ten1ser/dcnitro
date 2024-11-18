@@ -1,4 +1,4 @@
-# Discord Giveaway and Nitro Sniper Selfbot - Automated Discord Tool
+# Discord Giveaway and Nitro Sniper Selfbot
 
 ## Overview 🚀
 
