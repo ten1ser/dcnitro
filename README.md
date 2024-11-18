@@ -1,24 +1,27 @@
-# Discord Giveaway and Nitro Sniper Selfbot
+# Discord Giveaway and Nitro Sniper Selfbot - Automated Discord Tool
 
 ## Overview 🚀
 
-This Discord selfbot script automatically participates in giveaways and attempts to redeem Discord Nitro codes as fast as possible. It aims to operate stealthily to avoid detection by using randomized headers, user agents, and device identifiers. **Use at your own risk**—selfbotting violates Discord's Terms of Service and may result in an account ban.
+This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes as fast as possible. It aims to operate stealthily to avoid detection by using randomized headers, user agents, and device identifiers. **Use at your own risk**—selfbotting violates Discord's Terms of Service and may result in an account ban.
+
+This tool is ideal for users looking for a **Discord Nitro sniper** and **giveaway bot** that integrates directly with their account, automating **Nitro code redemption** and giveaway participation to maximize success.
 
 ## Features 🌟
 
-- 🎉 **Giveaway Participation**: Joins giveaways by clicking buttons or adding emoji reactions.
-- ⚡ **Instant Nitro Sniper**: Quickly detects and attempts to redeem Nitro gift codes.
+- 🎉 **Giveaway Participation**: Joins Discord giveaways by clicking buttons or adding emoji reactions.
+- ⚡ **Instant Nitro Sniper**: Quickly detects and attempts to redeem Discord Nitro gift codes.
 - 🕵️ **Stealth Features**: Uses randomized User Agents, device identifiers, and request headers to reduce detection risks.
 - 🔔 **Webhook Notifications**: Sends real-time notifications to a configured webhook to track snipes and winnings.
 - 📝 **Logging**: Logs important actions to both console and file for review.
+- 🔍 **Hidden Features**: Added stealth options for reducing detection from Discord's anti-bot systems.
 
 ## Disclaimer ⚠️
 
-This bot is for educational purposes only. Using unauthorized bots on a normal Discord user account is against Discord's Terms of Service and may result in your account being permanently banned. The author is not responsible for any misuse or bans resulting from the use of this bot.
+This bot is for **educational purposes** only. Using unauthorized bots on a Discord user account is against Discord's Terms of Service and may result in your account being permanently banned. The author is not responsible for any misuse or bans resulting from the use of this bot.
 
 ## Requirements 📋
 
-- Python 3.7+
+- Python 3.7+ (recommended for optimal performance with Discord bots)
 - `aiohttp`, `discord.py` (selfbot version), and other dependencies listed in `requirements.txt`
 
 ## Installation 💻
@@ -50,8 +53,7 @@ This bot is for educational purposes only. Using unauthorized bots on a normal D
 
    ![Bot Running in Windows CMD](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/cmd.png)
 
-   
-   *Screenshots have been added to illustrate the bot's functions and provide better understanding of its operations.*
+   *Screenshots have been added to illustrate the bot's functions and provide a better understanding of its operations.*
 
 ## Configuration 🔧
 
@@ -162,7 +164,7 @@ Example `config.json`:
 
 ## Warning ⚠️
 
-Selfbots are strictly against Discord's Terms of Service. Use this script at your own risk, and only on test accounts that you are willing to lose.
+**Discord Nitro sniper**, **Discord giveaway bot**, and other selfbots are strictly against Discord's Terms of Service. Use this script at your own risk, and only on test accounts that you are willing to lose.
 
 ## Contributing 🤝
 
@@ -178,5 +180,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 - Thanks to the contributors of `discord.py` and other Python packages that made this project possible.
 
-**Note**: This bot is for educational purposes only. Misuse, including violating Discord's Terms of Service, can lead to a ban or other legal consequences.
+**Note**: This bot is for **educational purposes** only. Misuse, including violating Discord's Terms of Service, can lead to a ban or other legal consequences.
 
