@@ -1,6 +1,11 @@
 # Discord Giveaway and Nitro Sniper Selfbot
 
+![Logo](https://files.oaiusercontent.com/file-LGrDOJboN4Xx0kzlEJWmpTms?se=2024-11-19T13%3A30%3A00Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D3dada67e-c593-42be-aaaa-a636db131f94.webp&sig=c3BfPx0XYOj9MA8hyjCsVpXNADRSCtl0qZ7XZveKhPM%3D)
+
 ## Overview 🚀
+
+This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes...
+
 
 This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes as fast as possible. It aims to operate stealthily to avoid detection by using randomized headers, user agents, and device identifiers. **Use at your own risk**—selfbotting violates Discord's Terms of Service and may result in an account ban.
 
