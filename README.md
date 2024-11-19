@@ -1,6 +1,6 @@
 # Discord Giveaway and Nitro Sniper Selfbot
 
-![Logo](https://files.oaiusercontent.com/file-LGrDOJboN4Xx0kzlEJWmpTms?se=2024-11-19T13%3A30%3A00Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D3dada67e-c593-42be-aaaa-a636db131f94.webp&sig=c3BfPx0XYOj9MA8hyjCsVpXNADRSCtl0qZ7XZveKhPM%3D)
+![Logo](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/logo.jpg)
 
 ## Overview 🚀
 
