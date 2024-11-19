@@ -2,9 +2,6 @@
 
 ## Overview 🚀
 
-This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes...
-
-
 This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes as fast as possible. It aims to operate stealthily to avoid detection by using randomized headers, user agents, and device identifiers. **Use at your own risk**—selfbotting violates Discord's Terms of Service and may result in an account ban.
 
 This tool is ideal for users looking for a **Discord Nitro sniper** and **giveaway bot** that integrates directly with their account, automating **Nitro code redemption** and giveaway participation to maximize success.
@@ -17,6 +14,7 @@ This tool is ideal for users looking for a **Discord Nitro sniper** and **giveaw
 - 🔔 **Webhook Notifications**: Sends real-time notifications to a configured webhook to track snipes and winnings.
 - 📝 **Logging**: Logs important actions to both console and file for review.
 - 🔍 **Hidden Features**: Added stealth options for reducing detection from Discord's anti-bot systems.
+- 📤 **DM Giveaway Host**: Automatically sends a direct message to the giveaway host when a giveaway is won, based on mentions in the original giveaway message.
 
 ## Disclaimer ⚠️
 
@@ -131,6 +129,7 @@ Example `config.json`:
 - **Improved Detection**: Automatically detects giveaway messages and joins by reacting.
 - **Prize Notifications**: Sends webhook notifications and attempts to DM the giveaway creator if you win.
 - **Better Prize Extraction**: Uses enhanced logic to accurately extract and display the giveaway prize.
+- **DM Giveaway Host**: Automatically sends a direct message to the giveaway host when a giveaway is won, by fetching the original giveaway message and notifying mentioned users.
 
    ![Giveaway Sniped Webhook Notify](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/gwsniped.png)
 
@@ -156,6 +155,7 @@ Example `config.json`:
 - **check_nitro_codes**: Detects and redeems Nitro codes as soon as they are posted.
 - **handle_giveaway_reaction**: Reacts to giveaway messages, either clicking buttons or adding emojis.
 - **detect_giveaway_win_message**: Detects when a win message is posted and sends notifications, optionally DMing the giveaway creator.
+- **notify_giveaway_creator**: Fetches the original giveaway message and sends a direct message to the mentioned users about the win.
 - **BotConnectedInfo**: Notifies when the bot successfully connects to Discord, with account details.
 
 ## Avoiding Detection 🚫
