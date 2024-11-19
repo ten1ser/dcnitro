@@ -269,19 +269,21 @@ async def detect_giveaway_win_message(message):
         await notify_giveaway_creator(message, prize)
 
 async def notify_giveaway_creator(message, prize):
-    if message.author is None:
+    if message.reference is None:
         return
-    giveaway_creator = message.mentions[0] if message.mentions else message.author
-    dm_message = (f"Hello {giveaway_creator.name}, I noticed that I won the giveaway you hosted! 🎉\n"
-                  f"Prize: **{prize}**\n"
-                  f"[Click Here to view the winning message]({message.jump_url})")
-    try:
-        if giveaway_creator.id != client.user.id:  # Ensure not attempting to DM self
-            dm_channel = await giveaway_creator.create_dm()
-            await dm_channel.send(dm_message)
-            log(f"Sent a private message to {giveaway_creator.name} about the giveaway win.")
-    except Exception as e:
-        log(f"Failed to send a private message to {giveaway_creator.name}: {e}")
+    giveaway_message = await message.channel.fetch_message(message.reference.message_id)
+    mentioned_users = giveaway_message.mentions
+    for user in mentioned_users:
+        if user.id != client.user.id:  # Ensure not attempting to DM self
+            dm_message = (f"Hello {user.name}, I noticed that I won the giveaway you hosted! 🎉\n"
+                          f"Prize: **{prize}**\n"
+                          f"[Click Here to view the winning message]({message.jump_url})")
+            try:
+                dm_channel = await user.create_dm()
+                await dm_channel.send(dm_message)
+                log(f"Sent a private message to {user.name} about the giveaway win.")
+            except Exception as e:
+                log(f"Failed to send a private message to {user.name}: {e}")
 
 async def check_giveaway_message(message):
     if message.guild is None or message.author is None:
