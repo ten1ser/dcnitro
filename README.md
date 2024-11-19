@@ -1,7 +1,5 @@
 # Discord Giveaway and Nitro Sniper Selfbot
 
-![Logo](https://github.com/kubaam/Discord-Giveaway-and-Nitro-Sniper-Selfbot/blob/main/assets/logo.jpg)
-
 ## Overview 🚀
 
 This Discord selfbot script automatically participates in giveaways and redeems Discord Nitro codes...
