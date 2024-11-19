@@ -266,24 +266,39 @@ async def detect_giveaway_win_message(message):
 
     if check_content(message.content) or any(check_content(embed.to_dict().get("description", "")) for embed in message.embeds):
         await GiveawayWinInfo(message, prize, location, author)
-        await notify_giveaway_creator(message, prize)
+        await find_and_notify_giveaway_host(message, prize)
 
-async def notify_giveaway_creator(message, prize):
-    if message.reference is None:
+async def find_and_notify_giveaway_host(win_message, prize):
+    if win_message.reference is None or win_message.guild is None:
         return
-    giveaway_message = await message.channel.fetch_message(message.reference.message_id)
-    mentioned_users = giveaway_message.mentions
-    for user in mentioned_users:
-        if user.id != client.user.id:  # Ensure not attempting to DM self
-            dm_message = (f"Hello {user.name}, I noticed that I won the giveaway you hosted! 🎉\n"
+
+    try:
+        referenced_message = await win_message.channel.fetch_message(win_message.reference.message_id)
+        mentioned_users = [user for user in referenced_message.mentions if user.id != client.user.id]
+
+        # Also look for mentions in the embed fields, if any
+        for embed in referenced_message.embeds:
+            embed_dict = embed.to_dict()
+            if "description" in embed_dict:
+                mention_ids = [int(user_id) for user_id in re.findall(r"<@!?([0-9]+)>", embed_dict["description"])]
+                for mention_id in mention_ids:
+                    if mention_id != client.user.id:
+                        user = win_message.guild.get_member(mention_id)
+                        if user:
+                            mentioned_users.append(user)
+
+        if mentioned_users:
+            giveaway_host = mentioned_users[0]  # Assuming the first mentioned user is the host
+            dm_message = (f"Hello {giveaway_host.name}, I noticed that I won the giveaway you hosted! 🎉\n"
                           f"Prize: **{prize}**\n"
-                          f"[Click Here to view the winning message]({message.jump_url})")
-            try:
-                dm_channel = await user.create_dm()
-                await dm_channel.send(dm_message)
-                log(f"Sent a private message to {user.name} about the giveaway win.")
-            except Exception as e:
-                log(f"Failed to send a private message to {user.name}: {e}")
+                          f"[Click Here to view the winning message]({win_message.jump_url})")
+            dm_channel = await giveaway_host.create_dm()
+            await dm_channel.send(dm_message)
+            log(f"Sent a private message to {giveaway_host.name} about the giveaway win.")
+        else:
+            log("No valid user mentioned in the giveaway message to notify.")
+    except Exception as e:
+        log(f"Failed to find and notify the giveaway host: {e}")
 
 async def check_giveaway_message(message):
     if message.guild is None or message.author is None:
