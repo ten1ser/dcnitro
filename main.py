@@ -260,6 +260,8 @@ async def detect_giveaway_win_message(message):
         prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", embed_dict.get("description", ""), re.IGNORECASE)
         if prize_match:
             prize = prize_match.group(1).strip()
+        elif "title" in embed_dict:
+            prize = embed_dict["title"].strip()
 
     location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
     author = message.author.name
