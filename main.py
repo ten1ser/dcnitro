@@ -9,23 +9,38 @@ import datetime
 import logging
 import random
 import time
-import platform
 from discord.ext import commands
 
-# Always uninstall and install dependencies on start
+# Utility functions
+
 def uninstall_and_install():
     os.system(
         "pip uninstall discord -y && pip uninstall discord.py -y && pip uninstall discord.py-self -y && pip install -r requirements.txt"
     )
 
-# Run the uninstall and install on startup
-uninstall_and_install()
-
-
-# Clear console
 def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
 
+def restart_script():
+    log("Restarting script due to hard error...", save=True)
+    try:
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+    except OSError as e:
+        log(f"Failed to restart script: {e}", save=True)
+        sys.exit(1)
+
+def is_blacklisted(user_id):
+    return str(user_id) in BOT_BLACKLIST or (client.user and user_id == client.user.id)
+
+def log(content, do_everyone=False, save=False):
+    if save:
+        logging.info(content)
+    if do_everyone:
+        content = f"@everyone {content}"
+    print(f"[!] LOG: {content}")
+
+# Run the uninstall and install on startup
+uninstall_and_install()
 clear_console()
 
 # Set up Discord API base URL
@@ -87,24 +102,6 @@ HEADERS_EXTRA = [
     "X-Debug-Options"
 ]
 
-# Utility functions
-def restart_script():
-    log("Restarting script due to hard error...", save=True)
-    try:
-        os.execv(sys.executable, [sys.executable] + sys.argv)
-    except OSError as e:
-        log(f"Failed to restart script: {e}", save=True)
-        sys.exit(1)
-
-def is_blacklisted(user_id):
-    return str(user_id) in BOT_BLACKLIST or (client.user and user_id == client.user.id)
-
-def log(content, do_everyone=False, save=False):
-    logging.info(content) if save else None
-    if do_everyone:
-        content = f"@everyone {content}"
-    print(f"[!] LOG: {content}")
-
 async def send_webhook_notification(title, description, content="", color=16732345, footer_text="Giveaway Sniper", avatar_url="https://i.imgur.com/44N46up.gif"):
     if WEBHOOK_NOTIFICATION and WEBHOOK:
         data = {
@@ -150,7 +147,7 @@ async def GiveawayInfo(message, action, location, author):
 async def GiveawayWinInfo(message, prize, location, author):
     log(f"Detected Giveaway Win! Prize: {prize} | Location: {location} | Author: {author} [Click Here]({message.jump_url})", do_everyone=True, save=True)
     await send_webhook_notification(
-        title="🏆 **Giveaway Win Detected!**",
+        title=f"🏆 Giveaway Win: {prize}",
         description=f"**Congratulations!** You've won a giveaway for **{prize}**!\n**Location:** `{location}`\n**Hosted by:** {author}\n[Click Here to View Winning Message]({message.jump_url})",
         content="@everyone",
         color=3066993,  # Green color
@@ -204,7 +201,6 @@ async def redeem_nitro_code(token, code):
             }
 
             if status == 400:
-                # Separate Invalid code and Captcha required
                 error_detail = await response.json()
                 if 'captcha_key' in error_detail:
                     status_message = "Captcha required"
@@ -214,7 +210,7 @@ async def redeem_nitro_code(token, code):
                 retry_after = int(response.headers.get("Retry-After", 60))
                 log(f"Rate limited, retrying in {retry_after} seconds...")
                 await asyncio.sleep(retry_after)
-                await redeem_nitro_code(token, code)  # Retry after rate limit
+                await redeem_nitro_code(token, code)
                 return
             else:
                 status_message = status_messages.get(status, f"Error {status}")
@@ -257,50 +253,55 @@ async def detect_giveaway_win_message(message):
 
     for embed in message.embeds:
         embed_dict = embed.to_dict()
-        prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", embed_dict.get("description", ""), re.IGNORECASE)
-        if prize_match:
-            prize = prize_match.group(1).strip()
-        elif "title" in embed_dict:
-            prize = embed_dict["title"].strip()
+        for key, value in embed_dict.items():
+            if isinstance(value, str):
+                if "prize" in value.lower():
+                    prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", value, re.IGNORECASE)
+                    if prize_match:
+                        prize = prize_match.group(1).strip()
+                if check_content(value):
+                    location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
+                    author = message.author.name
+                    await GiveawayWinInfo(message, prize, location, author)
+                    return
 
     location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
     author = message.author.name
 
-    if check_content(message.content) or any(check_content(embed.to_dict().get("description", "")) for embed in message.embeds):
+    if check_content(message.content) or any(
+        check_content(embed.to_dict().get("description", "")) or
+        any(check_content(value) for key, value in embed.to_dict().items() if isinstance(value, str))
+        for embed in message.embeds
+    ):
+        # Attempt to get the original giveaway join message
+        if message.reference:
+            join_message = await message.channel.fetch_message(message.reference.message_id)
+            join_prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", join_message.content, re.IGNORECASE)
+            if join_prize_match:
+                prize = join_prize_match.group(1).strip()
+            await notify_giveaway_creator(message, prize, join_message)
         await GiveawayWinInfo(message, prize, location, author)
-        await find_and_notify_giveaway_host(message, prize)
 
-async def find_and_notify_giveaway_host(win_message, prize):
-    if win_message.reference is None or win_message.guild is None:
+async def notify_giveaway_creator(win_message, prize, join_message):
+    if join_message is None or win_message.author is None:
         return
-
+    # Extract the giveaway creator from the join message
+    mentioned_users = [user for user in join_message.mentions if user.id != client.user.id]
+    if mentioned_users:
+        giveaway_creator = mentioned_users[0]
+    else:
+        return  # No valid giveaway host found
+    
+    dm_message = (f"Hello {giveaway_creator.name}, I noticed that I won the giveaway you hosted! 🎉\n"
+                  f"Prize: **{prize}**\n"
+                  f"[Click Here to view the winning message]({win_message.jump_url})")
     try:
-        referenced_message = await win_message.channel.fetch_message(win_message.reference.message_id)
-        mentioned_users = [user for user in referenced_message.mentions if user.id != client.user.id]
-
-        # Also look for mentions in the embed fields, if any
-        for embed in referenced_message.embeds:
-            embed_dict = embed.to_dict()
-            if "description" in embed_dict:
-                mention_ids = [int(user_id) for user_id in re.findall(r"<@!?([0-9]+)>", embed_dict["description"])]
-                for mention_id in mention_ids:
-                    if mention_id != client.user.id:
-                        user = win_message.guild.get_member(mention_id)
-                        if user:
-                            mentioned_users.append(user)
-
-        if mentioned_users:
-            giveaway_host = mentioned_users[0]  # Assuming the first mentioned user is the host
-            dm_message = (f"Hello {giveaway_host.name}, I noticed that I won the giveaway you hosted! 🎉\n"
-                          f"Prize: **{prize}**\n"
-                          f"[Click Here to view the winning message]({win_message.jump_url})")
-            dm_channel = await giveaway_host.create_dm()
+        if giveaway_creator.id != client.user.id:  # Ensure not attempting to DM self
+            dm_channel = await giveaway_creator.create_dm()
             await dm_channel.send(dm_message)
-            log(f"Sent a private message to {giveaway_host.name} about the giveaway win.")
-        else:
-            log("No valid user mentioned in the giveaway message to notify.")
+            log(f"Sent a private message to {giveaway_creator.name} about the giveaway win.")
     except Exception as e:
-        log(f"Failed to find and notify the giveaway host: {e}")
+        log(f"Failed to send a private message to {giveaway_creator.name}: {e}")
 
 async def check_giveaway_message(message):
     if message.guild is None or message.author is None:
@@ -313,7 +314,13 @@ async def check_giveaway_message(message):
     def contains_keyword(content):
         return any(keyword in content.lower() for keyword in keywords)
 
-    if contains_keyword(message.content) or any(contains_keyword(embed.to_dict().get("description", "")) for embed in message.embeds):
+    # Check for keywords in message content and embeds
+    if contains_keyword(message.content) or any(
+        contains_keyword(embed.to_dict().get("description", "")) or
+        contains_keyword(embed.to_dict().get("title", "")) or
+        any(contains_keyword(value) for key, value in embed.to_dict().items() if isinstance(value, str))
+        for embed in message.embeds
+    ):
         await handle_giveaway_reaction(message)
 
 # Discord Selfbot Setup
