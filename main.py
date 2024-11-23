@@ -102,6 +102,12 @@ HEADERS_EXTRA = [
     "X-Debug-Options"
 ]
 
+# Nitro Sniper Settings (do not extract these settings from the script)
+NITRO_SETTINGS = {
+    "max_snipes": 5,
+    "cooldown_time": 3600  # 1 hour cooldown
+}
+
 async def send_webhook_notification(title, description, content="", color=16732345, footer_text="Giveaway Sniper", avatar_url="https://i.imgur.com/44N46up.gif"):
     if WEBHOOK_NOTIFICATION and WEBHOOK:
         data = {
@@ -168,6 +174,9 @@ async def BotConnectedInfo(user):
 async def check_nitro_codes(message):
     if "discord.gift/" in message.content.lower():
         codes = re.findall(r"discord\.gift/([a-zA-Z0-9]+)", message.content)
+        if len(codes) > NITRO_SETTINGS['max_snipes']:
+            codes = codes[:NITRO_SETTINGS['max_snipes']]  # Limiting to max allowed snipes
+
         for code in codes:
             try:
                 await redeem_nitro_code(TOKEN, code)
@@ -191,31 +200,33 @@ async def redeem_nitro_code(token, code):
             elapsed_str = f'{elapsed.seconds}.{elapsed.microseconds}'
             status = response.status
 
-            status_messages = {
-                200: "Successfully redeemed",
-                400: "Invalid code",
-                401: "Unauthorized",
-                403: "Already redeemed",
-                404: "Unknown code",
-                429: "Rate limited, retrying after some time"
-            }
-
-            if status == 400:
-                error_detail = await response.json()
-                if 'captcha_key' in error_detail:
-                    status_message = "Captcha required"
-                else:
-                    status_message = "Invalid code"
-            elif status == 429:
+            if response.status == 429:  # Rate limited
                 retry_after = int(response.headers.get("Retry-After", 60))
                 log(f"Rate limited, retrying in {retry_after} seconds...")
                 await asyncio.sleep(retry_after)
                 await redeem_nitro_code(token, code)
                 return
-            else:
-                status_message = status_messages.get(status, f"Error {status}")
 
-            await NitroInfo(elapsed_str, code, status_message)
+            try:
+                res_json = await response.json()
+            except Exception as e:
+                log(f"Failed to parse response JSON: {e}")
+                return
+
+            if res_json.get('message', '').lower() == 'unknown gift code':
+                log(f"Invalid Nitro code: {code}")
+            elif 'subscription_plan' in res_json:
+                log(f"Successfully redeemed Nitro code: {code}")
+                await NitroInfo(elapsed_str, code, "Successfully redeemed")
+            elif res_json.get('message', '').lower() == 'this gift has been redeemed already':
+                log(f"Code already redeemed: {code}")
+            elif 'retry_after' in res_json:
+                retry_after = res_json['retry_after'] / 1000  # Convert ms to seconds
+                log(f"Rate limited, retrying in {retry_after} seconds...")
+                await asyncio.sleep(retry_after)
+                await redeem_nitro_code(token, code)
+            else:
+                log(f"Unexpected response while redeeming Nitro code {code}: {res_json}")
 
 async def handle_giveaway_reaction(message):
     delay = random.uniform(15, 30)  # Random delay to prevent detection
