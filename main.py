@@ -30,9 +30,9 @@ def restart_script():
 def is_blacklisted(user_id):
     return str(user_id) in BOT_BLACKLIST or (client.user and user_id == client.user.id)
 
-def log(content, notify_everyone=False, save=False):
+def log(content, notify_everyone=False, save=False, level=logging.INFO):
     if save:
-        logging.info(content)
+        logging.log(level, content)
     if notify_everyone:
         content = f"@everyone {content}"
     print(f"[!] LOG: {content}")
@@ -47,7 +47,7 @@ def load_config():
         with open("config.json", "r") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
-        log(f"Configuration file error: {e}. Exiting...", save=True)
+        log(f"Configuration file error: {e}. Exiting...", save=True, level=logging.ERROR)
         sys.exit(1)
 
 config_data = load_config()
@@ -62,34 +62,34 @@ if not TOKEN:
     raise ValueError("Discord bot token is not set in config.json")
 
 # Set up logging
-log_formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 log_file_handler = RotatingFileHandler('logs.txt', maxBytes=5 * 1024 * 1024, backupCount=5)
 log_file_handler.setFormatter(log_formatter)
 logging.basicConfig(level=logging.INFO, handlers=[log_file_handler])
 
 # User-Agent list to avoid detection
-USER_AGENTS = [
+USER_AGENTS = config_data.get("UserAgents", [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
     "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-]
+])
 
 # Random hardware identifiers to avoid detection
-DEVICE_IDS = [
+DEVICE_IDS = config_data.get("DeviceIds", [
     "a1b2c3d4e5f6g7h8i9j0",
     "098f6bcd4621d373cade4e832627b4f6",
     "e5b3d9c7a1f8h2g4i0j7k6l5m9n8o3p1",
     "d41d8cd98f00b204e9800998ecf8427e",
     "1a2b3c4d5e6f7g8h9i0jklmnopqrstu"
-]
+])
 
 # Nitro Sniper Settings
-NITRO_SETTINGS = {
+NITRO_SETTINGS = config_data.get("NitroSettings", {
     "max_snipes": 5,
     "cooldown_time": 3600  # 1 hour cooldown
-}
+})
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
 async def send_webhook_notification(title, description, content="", color=16732345, footer_text="Giveaway Sniper", avatar_url="https://i.imgur.com/44N46up.gif"):
@@ -108,7 +108,7 @@ async def send_webhook_notification(title, description, content="", color=167323
         async with aiohttp.ClientSession() as session:
             async with session.post(WEBHOOK, json=data) as response:
                 if response.status != 204:
-                    log(f"Failed to send webhook notification: {response.status} - {await response.text()}", save=True)
+                    log(f"Failed to send webhook notification: {response.status} - {await response.text()}", save=True, level=logging.ERROR)
 
 async def NitroInfo(elapsed, code, status):
     log(f"Elapsed: {elapsed}, Code: {code}, Status: {status}")
@@ -132,7 +132,7 @@ async def GiveawayInfo(message, action, location, author):
     )
 
 async def GiveawayWinInfo(message, prize, location, author):
-    log(f"Detected Giveaway Win! Prize: {prize} | Location: {location} | Author: {author} [Click Here]({message.jump_url})", notify_everyone=True, save=True)
+    log(f"Detected Giveaway Win! Prize: {prize} | Location: {location} | Author: {author} [Click Here]({message.jump_url})", notify_everyone=True, save=True, level=logging.INFO)
     await send_webhook_notification(
         title=f"🏆 Giveaway Win: {prize}",
         description=f"**Congratulations!** You've won a giveaway for **{prize}**!\n**Location:** `{location}`\n**Hosted by:** {author}\n[Click Here to View Winning Message]({message.jump_url})",
@@ -152,7 +152,6 @@ async def BotConnectedInfo(user):
         avatar_url="https://i.imgur.com/connected-icon.png"
     )
 
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
 async def redeem_nitro_code(token, code):
     url = f"https://discord.com/api/v9/entitlements/gift-codes/{code}/redeem"
     headers = {
@@ -172,7 +171,7 @@ async def redeem_nitro_code(token, code):
 
             if response.status == 429:
                 retry_after = int(response.headers.get("Retry-After", 60))
-                log(f"Rate limited, retrying in {retry_after} seconds...")
+                log(f"Rate limited, retrying in {retry_after} seconds...", level=logging.WARNING)
                 await asyncio.sleep(retry_after)
                 await redeem_nitro_code(token, code)
                 return
@@ -180,26 +179,26 @@ async def redeem_nitro_code(token, code):
             try:
                 res_json = await response.json()
             except Exception as e:
-                log(f"Failed to parse response JSON: {e}")
+                log(f"Failed to parse response JSON: {e}", level=logging.ERROR)
                 await NitroInfo(elapsed_str, code, f"Failed to parse response JSON: {e}")
                 return
 
             if res_json.get('message', '').lower() == 'unknown gift code':
-                log(f"Invalid Nitro code: {code}")
+                log(f"Invalid Nitro code: {code}", level=logging.WARNING)
                 await NitroInfo(elapsed_str, code, "Invalid Nitro code")
             elif 'subscription_plan' in res_json:
-                log(f"Successfully redeemed Nitro code: {code}")
+                log(f"Successfully redeemed Nitro code: {code}", level=logging.INFO)
                 await NitroInfo(elapsed_str, code, "Successfully redeemed")
             elif res_json.get('message', '').lower() == 'this gift has been redeemed already':
-                log(f"Code already redeemed: {code}")
+                log(f"Code already redeemed: {code}", level=logging.INFO)
                 await NitroInfo(elapsed_str, code, "Code already redeemed")
             elif 'retry_after' in res_json:
                 retry_after = res_json['retry_after'] / 1000
-                log(f"Rate limited, retrying in {retry_after} seconds...")
+                log(f"Rate limited, retrying in {retry_after} seconds...", level=logging.WARNING)
                 await asyncio.sleep(retry_after)
                 await redeem_nitro_code(token, code)
             else:
-                log(f"Unexpected response while redeeming Nitro code {code}: {res_json}")
+                log(f"Unexpected response while redeeming Nitro code {code}: {res_json}", level=logging.ERROR)
                 await NitroInfo(elapsed_str, code, f"Unexpected response: {res_json}")
 
 async def check_nitro_codes(message):
@@ -223,7 +222,7 @@ async def check_nitro_codes(message):
                 try:
                     await redeem_nitro_code(TOKEN, code)
                 except Exception as e:
-                    log(f"Error redeeming nitro code {code}: {e}")
+                    log(f"Error redeeming nitro code {code}: {e}", level=logging.ERROR)
 
 async def handle_giveaway_reaction(message):
     delay = random.uniform(15, 30)
@@ -244,7 +243,7 @@ async def handle_giveaway_reaction(message):
                         await message.add_reaction("🎉")
                         await GiveawayInfo(message, "Reacted with Emoji", location, author)
     except Exception as e:
-        log(f"Error handling giveaway reaction: {e}")
+        log(f"Error handling giveaway reaction: {e}", level=logging.ERROR)
 
 async def detect_giveaway_win_message(message):
     keywords = ["won", "winner", "congratulations", "victory"]
@@ -289,11 +288,11 @@ async def detect_giveaway_win_message(message):
                 if join_prize_match:
                     prize = join_prize_match.group(1).strip()
             except discord.NotFound:
-                log(f"Referenced message not found for message ID: {message.reference.message_id}")
+                log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
             except discord.Forbidden:
-                log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}")
+                log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
             except Exception as e:
-                log(f"Error fetching referenced message: {e}")
+                log(f"Error fetching referenced message: {e}", level=logging.ERROR)
         await GiveawayWinInfo(message, prize, location, author)
 
 async def check_giveaway_message(message):
@@ -329,23 +328,29 @@ async def on_message(message):
     if message.author is None:
         return
 
-    tasks = [
-        check_nitro_codes(message),
-        detect_giveaway_win_message(message),
-    ]
+    await asyncio.gather(
+        handle_nitro_codes(message),
+        handle_giveaway_win_message(message),
+        handle_bot_message(message)
+    )
 
+async def handle_bot_message(message):
     if message.author.bot and not is_blacklisted(message.author.id):
-        tasks.append(check_giveaway_message(message))
+        await check_giveaway_message(message)
 
-    await asyncio.gather(*tasks)
+async def handle_nitro_codes(message):
+    await check_nitro_codes(message)
+
+async def handle_giveaway_win_message(message):
+    await detect_giveaway_win_message(message)
 
 def main():
     try:
         client.run(TOKEN, reconnect=True)
     except discord.errors.LoginFailure:
-        log("Improper token has been passed or two-factor authentication is required. Please check the token in config.json.", save=True)
+        log("Improper token has been passed or two-factor authentication is required. Please check the token in config.json.", save=True, level=logging.ERROR)
     except Exception as e:
-        log(f"An error occurred while starting the bot: {e}", save=True)
+        log(f"An error occurred while starting the bot: {e}", save=True, level=logging.ERROR)
         restart_script()
 
 if __name__ == "__main__":
