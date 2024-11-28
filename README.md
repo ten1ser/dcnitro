@@ -12,7 +12,7 @@ This tool is ideal for users searching for a reliable, fast, and stealthy way to
 - ⚡ **Instant Nitro Code Sniper**: Instantly detects and attempts to redeem Discord Nitro gift codes as soon as they are posted, ensuring you are among the first to redeem.
 - 🕵️ **Stealth Features for Low Detection**: Utilizes randomized User Agents, device identifiers, and custom HTTP headers to disguise bot activity, effectively reducing the risk of detection by Discord.
 - 🔔 **Webhook Notifications**: Provides real-time notifications via a configured webhook to keep you updated on successful snipes, giveaway wins, and other critical events.
-- 📝 **Comprehensive Logging**: Logs all actions, such as giveaway participation and Nitro redemptions, to both console and log files for easy tracking and debugging.
+- 📜 **Comprehensive Logging**: Logs all actions, such as giveaway participation and Nitro redemptions, to both console and log files for easy tracking and debugging.
 - 🔍 **Advanced Detection and Monitoring**: Analyzes both message content and embedded fields to ensure thorough detection of giveaways and Nitro codes across different Discord channels.
 - 📤 **Automated Direct Messages**: Sends direct messages to giveaway hosts after winning, showing gratitude and providing a personalized touch.
 - 📊 **Customizable Settings**: Offers detailed configuration options through `config.json` to allow for full control over the bot's behavior.
