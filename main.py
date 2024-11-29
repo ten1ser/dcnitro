@@ -87,8 +87,8 @@ DEVICE_IDS = config_data.get("DeviceIds", [
 
 # Nitro Sniper Settings
 NITRO_SETTINGS = config_data.get("NitroSettings", {
-    "max_snipes": 5,
-    "cooldown_time": 3600  # 1 hour cooldown
+    "max_snipes": 69,
+    "cooldown_time": 360  # 10 minutes cooldown
 })
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
@@ -131,7 +131,7 @@ async def GiveawayInfo(message, action, location, author):
         avatar_url="https://i.imgur.com/giveaway-icon.png"
     )
 
-async def GiveawayWinInfo(message, prize, location, author):
+async def GiveawayWinInfo(message, prize, location, author, giveaway_host):
     log(f"Detected Giveaway Win! Prize: {prize} | Location: {location} | Author: {author} [Click Here]({message.jump_url})", notify_everyone=True, save=True, level=logging.INFO)
     await send_webhook_notification(
         title=f"🏆 Giveaway Win: {prize}",
@@ -141,6 +141,16 @@ async def GiveawayWinInfo(message, prize, location, author):
         footer_text="Giveaway Win | Notification",
         avatar_url="https://i.imgur.com/win-icon.png"
     )
+    await send_direct_message(prize, location, author, giveaway_host)
+
+async def send_direct_message(prize, location, author, giveaway_host):
+    try:
+        if giveaway_host is not None and giveaway_host.id != client.user.id:
+            await giveaway_host.send(f"🎉 Your giveaway for **{prize}** has been won!\n**Location:** {location}\n**Winner:** {author}")
+    except discord.Forbidden:
+        log("Failed to send direct message due to insufficient permissions.", save=True, level=logging.ERROR)
+    except discord.HTTPException as e:
+        log(f"Failed to send direct message: {e}", save=True, level=logging.ERROR)
 
 async def BotConnectedInfo(user):
     log(f"Giveaway Sniper is connected to | user: {user.name} | id: {user.id}")
@@ -258,6 +268,8 @@ async def detect_giveaway_win_message(message):
     if prize_match:
         prize = prize_match.group(1).strip()
 
+    giveaway_host = None
+
     for embed in message.embeds:
         embed_dict = embed.to_dict()
         for key, value in embed_dict.items():
@@ -269,7 +281,23 @@ async def detect_giveaway_win_message(message):
                 if check_content(value):
                     location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
                     author = message.author.name
-                    await GiveawayWinInfo(message, prize, location, author)
+                    if message.reference:
+                        try:
+                            join_message = await message.channel.fetch_message(message.reference.message_id)
+                            hosted_by_match = re.search(r"(hosted by|hosted|by) @?([\w\s]+)", join_message.content, re.IGNORECASE)
+                            if hosted_by_match:
+                                host_username = hosted_by_match.group(2).strip()
+                                for member in message.guild.members:
+                                    if member.name == host_username or member.display_name == host_username:
+                                        giveaway_host = member
+                                        break
+                        except discord.NotFound:
+                            log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
+                        except discord.Forbidden:
+                            log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
+                        except Exception as e:
+                            log(f"Error fetching referenced message: {e}", level=logging.ERROR)
+                    await GiveawayWinInfo(message, prize, location, author, giveaway_host)
                     return
 
     location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
@@ -287,13 +315,20 @@ async def detect_giveaway_win_message(message):
                 join_prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", join_message.content, re.IGNORECASE)
                 if join_prize_match:
                     prize = join_prize_match.group(1).strip()
+                hosted_by_match = re.search(r"(hosted by|hosted|by) @?([\w\s]+)", join_message.content, re.IGNORECASE)
+                if hosted_by_match:
+                    host_username = hosted_by_match.group(2).strip()
+                    for member in message.guild.members:
+                        if member.name == host_username or member.display_name == host_username:
+                            giveaway_host = member
+                            break
             except discord.NotFound:
                 log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
             except discord.Forbidden:
                 log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
             except Exception as e:
                 log(f"Error fetching referenced message: {e}", level=logging.ERROR)
-        await GiveawayWinInfo(message, prize, location, author)
+        await GiveawayWinInfo(message, prize, location, author, giveaway_host)
 
 async def check_giveaway_message(message):
     if message.guild is None or message.author is None:
@@ -339,7 +374,7 @@ async def handle_bot_message(message):
         await check_giveaway_message(message)
 
 async def handle_nitro_codes(message):
-    await check_nitro_codes(message)
+    await check_nitro_codes(message)a
 
 async def handle_giveaway_win_message(message):
     await detect_giveaway_win_message(message)
