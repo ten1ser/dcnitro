@@ -1,4 +1,21 @@
 import os
+
+def run_command(command: str):
+    """Runs a shell command."""
+    try:
+        os.system(command)
+    except Exception as e:
+        log(f"Failed to run command '{command}': {e}", save=True, level=logging.ERROR)
+
+def clear_console():
+    """Clears the console."""
+    os.system("cls" if os.name == "nt" else "clear")
+
+# Run uninstall and install command before importing other libraries
+run_command("pip uninstall discord discord.py discord.py-self -y && pip install -r requirements.txt")
+
+clear_console()
+
 import sys
 import asyncio
 import json
