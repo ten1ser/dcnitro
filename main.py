@@ -13,6 +13,7 @@ from discord.ext import commands
 from tenacity import retry, stop_after_attempt, wait_exponential
 from logging.handlers import RotatingFileHandler
 from typing import Optional, Dict, List, Union
+import platform
 
 # Configuration Management
 @dataclasses.dataclass
@@ -415,7 +416,12 @@ async def check_giveaway_message(message: discord.Message):
     ):
         await handle_giveaway_reaction(message)
 
+# Main Function
 def main():
+    # Set the SelectorEventLoop on Windows to avoid compatibility issues with aiodns
+    if platform.system() == "Windows":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
     try:
         client.run(config.token, reconnect=True)
     except discord.errors.LoginFailure:
