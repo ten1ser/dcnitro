@@ -63,6 +63,8 @@ The bot requires a `config.json` file in the root directory with the following f
 - **Webhook**: Webhook URL to send notifications about successful snipes and wins.
 - **BotBlacklist**: A list of bot IDs that should be ignored when participating in giveaways.
 - **WebhookNotification**: Boolean value to enable or disable webhook notifications.
+- **UserAgents**: A list of user agents to be used for randomizing HTTP requests.
+- **DeviceIds**: A list of device identifiers used to further randomize and avoid detection.
 
 Example `config.json`:
 
@@ -77,6 +79,16 @@ Example `config.json`:
         "432610292342587392",
         "1156418379050127430",
         "1137344054187802664"
+    ],
+    "UserAgents": [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "curl/7.68.0",
+        "Googlebot/2.1 (+http://www.google.com/bot.html)"
+    ],
+    "DeviceIds": [
+        "a1b2c3d4e5f6g7h8i9j0",
+        "098f6bcd4621d373cade4e832627b4f6",
+        "1234567890abcdef1234567890abcdef"
     ]
 }
 ```
@@ -153,4 +165,3 @@ This project is licensed under the MIT License. Please see the `LICENSE` file fo
 - Special thanks to the contributors of `discord.py`, `aiohttp`, and other Python libraries that made this project possible.
 
 **Note**: This bot is intended for **educational purposes** only. Improper use, such as violating Discord's Terms of Service, can lead to account bans or other penalties. Always use caution and use this tool only on accounts you can afford to lose.
-
