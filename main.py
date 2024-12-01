@@ -352,6 +352,25 @@ async def detect_giveaway_win_message(message: discord.Message):
         prize = prize_match.group(1).strip()
 
     giveaway_host = None
+    location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
+    author = message.author.name
+
+    if message.reference:
+        try:
+            join_message = await message.channel.fetch_message(message.reference.message_id)
+            hosted_by_match = re.search(r"(hosted by|hosted|by) @?([\w\s]+)", join_message.content, re.IGNORECASE)
+            if hosted_by_match:
+                host_username = hosted_by_match.group(2).strip()
+                for member in message.guild.members:
+                    if member.name == host_username or member.display_name == host_username:
+                        giveaway_host = member
+                        break
+        except discord.NotFound:
+            log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
+        except discord.Forbidden:
+            log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
+        except Exception as e:
+            log(f"Error fetching referenced message: {e}", level=logging.ERROR)
 
     for embed in message.embeds:
         embed_dict = embed.to_dict()
@@ -362,29 +381,8 @@ async def detect_giveaway_win_message(message: discord.Message):
                     if prize_match:
                         prize = prize_match.group(1).strip()
                 if check_content(value):
-                    location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
-                    author = message.author.name
-                    if message.reference:
-                        try:
-                            join_message = await message.channel.fetch_message(message.reference.message_id)
-                            hosted_by_match = re.search(r"(hosted by|hosted|by) @?([\w\s]+)", join_message.content, re.IGNORECASE)
-                            if hosted_by_match:
-                                host_username = hosted_by_match.group(2).strip()
-                                for member in message.guild.members:
-                                    if member.name == host_username or member.display_name == host_username:
-                                        giveaway_host = member
-                                        break
-                        except discord.NotFound:
-                            log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
-                        except discord.Forbidden:
-                            log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
-                        except Exception as e:
-                            log(f"Error fetching referenced message: {e}", level=logging.ERROR)
                     await GiveawayWinInfo(message, prize, location, author, giveaway_host)
                     return
-
-    location = f"Server: {message.guild.name} | Channel: {message.channel.name}"
-    author = message.author.name
 
     if check_content(message.content) or any(
         check_content(embed.to_dict().get("description", "")) or
@@ -392,25 +390,6 @@ async def detect_giveaway_win_message(message: discord.Message):
         any(check_content(value) for key, value in embed.to_dict().items() if isinstance(value, str))
         for embed in message.embeds
     ):
-        if message.reference:
-            try:
-                join_message = await message.channel.fetch_message(message.reference.message_id)
-                join_prize_match = re.search(r"prize[:\-\s]+(.+?)(\.|\n|$)", join_message.content, re.IGNORECASE)
-                if join_prize_match:
-                    prize = join_prize_match.group(1).strip()
-                hosted_by_match = re.search(r"(hosted by|hosted|by) @?([\w\s]+)", join_message.content, re.IGNORECASE)
-                if hosted_by_match:
-                    host_username = hosted_by_match.group(2).strip()
-                    for member in message.guild.members:
-                        if member.name == host_username or member.display_name == host_username:
-                            giveaway_host = member
-                            break
-            except discord.NotFound:
-                log(f"Referenced message not found for message ID: {message.reference.message_id}", level=logging.WARNING)
-            except discord.Forbidden:
-                log(f"Permission denied to fetch referenced message ID: {message.reference.message_id}", level=logging.WARNING)
-            except Exception as e:
-                log(f"Error fetching referenced message: {e}", level=logging.ERROR)
         await GiveawayWinInfo(message, prize, location, author, giveaway_host)
 
 async def check_giveaway_message(message: discord.Message):
