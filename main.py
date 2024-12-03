@@ -1,4 +1,7 @@
 import os
+from server import keep_alive
+
+keep_alive()
 
 def run_command(command: str):
     """Runs a shell command."""
