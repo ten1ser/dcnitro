@@ -15,7 +15,6 @@ def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
 
 # Run uninstall and install command before importing other libraries
-run_command("pip uninstall discord discord.py discord.py-self -y && pip install -r requirements.txt")
 
 clear_console()
 
