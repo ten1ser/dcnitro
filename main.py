@@ -34,6 +34,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from logging.handlers import RotatingFileHandler
 from typing import Optional, Dict, List, Union
 import platform
+from dotenv import load_dotenv
+
+load_dotenv()
+
+TOKEN = os.getenv('Token')
+WEBHOOK = os.getenv('Webhook')
 
 # Configuration Management
 @dataclasses.dataclass
@@ -52,8 +58,8 @@ class Config:
             with open(filepath, "r", encoding='utf-8') as f:
                 data = json.load(f)
                 return Config(
-                    token=data.get("Token", [None])[0],
-                    webhook=data.get("Webhook"),
+                    token=TOKEN,
+                    webhook=WEBHOOK,
                     bot_blacklist=data.get("BotBlacklist", []),
                     webhook_notification=data.get("WebhookNotification", True),
                     user_agents=data.get("UserAgents", []),
