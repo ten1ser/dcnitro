@@ -1,16 +1,7 @@
 import os
-from dotenv import load_dotenv
-import json
 from server import keep_alive
 
 keep_alive()
-load_dotenv()
-
-discord_token = os.getenv('Token')
-webhook_url = os.getenv('Webhook')
-
-with open('config.json', 'r') as f:
-    config = json.load(f)
 
 def run_command(command: str):
     """Runs a shell command."""
