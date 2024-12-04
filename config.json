@@ -1,8 +1,4 @@
 {
-    "Token": [
-        "YOUR_DISCORD_USER_TOKEN"
-    ],
-    "Webhook": "YOUR_WEBHOOK_URL",
     "WebhookNotification": true,
     "BotBlacklist": [
         "432610292342587392",
